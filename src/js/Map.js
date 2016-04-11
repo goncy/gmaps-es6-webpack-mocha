@@ -2,9 +2,12 @@ import GoogleMapsLoader from 'google-maps';
 
 let _mapLoaded = false;
 let _map;
+let _mapContainer;
 
 export default class Mapa {
-  constructor() {
+  constructor(options) {
+
+    _mapContainer = options.targetDivId;
 
     if (_mapLoaded) {
       this._promise = new Promise((resolve, reject) => {
@@ -22,7 +25,7 @@ export default class Mapa {
 
         function createMap() {
           _mapLoaded = true;
-          let _map = new google.maps.Map(document.getElementById('map'), {
+          let _map = new google.maps.Map(document.getElementById(options.targetDivId), {
             center: {lat: -34.397, lng: 110.644},
             zoom: 8
           })
