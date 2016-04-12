@@ -1,20 +1,19 @@
 import {} from './scss/main';
-import Mapa from './js/Map';
+import MapManager from './js/MapManager';
 
-let map = new Mapa({targetDivId: 'map'});
+let mapDiv = document.getElementById("map");
+let mapManager = new MapManager();
 
-map.then( mapa => {
-  createMarker(mapa);
+mapManager.load().then(({manager, google, alreadyLoaded}) => {
+  let mapa = manager.createMap({element: mapDiv, center: {lat: -34.7040225, lng: -58.308597}, zoom: 13});
+  createMarker({mapa: mapa, center: {lat: -34.7040225, lng: -58.308597}});
 });
 
-map.catch( (err) => {
-  alert(err);
-});
-
-function createMarker(mapa) {
+function createMarker({mapa,center,title = "Hola mundo"} = {}) {
   return new google.maps.Marker({
-    position: {lat: -34.397, lng: 150.644},
+    position: center,
     map: mapa,
-    title: 'Hello World!'
+    title: title,
+    animation: google.maps.Animation.DROP
   });
 }

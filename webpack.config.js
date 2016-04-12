@@ -37,6 +37,7 @@ module.exports = {
       },
       {
         test: /\.test\.js$/,
+        exclude: /node_modules/,
         loader: "mocha!babel"
       }
     ],
