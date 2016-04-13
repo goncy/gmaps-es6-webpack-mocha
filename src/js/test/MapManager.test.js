@@ -1,7 +1,5 @@
-let expect = require("chai").expect;
-let jsdom = require('mocha-jsdom');
-
 import MapManager from '../MapManager';
+let expect = require("chai").expect;
 
 describe("Testea el modulo MapManager", () => {
 
@@ -28,7 +26,7 @@ describe("Testea el modulo MapManager", () => {
     });
 
     it("Deberia devolverme la libreria aunque la cargue dos veces", (done) => {
-      mapManager.load().then(({manager, google, alreadyLoaded}) => {
+      mapManager.load().then(({ google, alreadyLoaded}) => {
         let loaded = mapManager.isLoaded();
         expect(loaded).to.equal(true);
         expect(alreadyLoaded).to.equal(true);
@@ -38,25 +36,32 @@ describe("Testea el modulo MapManager", () => {
   });
 
   describe('Creacion de mapa', () => {
-    jsdom();
-
-    it('Deberia crear un mapa en el elemento especificado', () => {
+    it('Deberia crear un mapa en el elemento especificado', (done) => {
       let mapDiv = document.createElement('div');
-      let map = mapManager.createMap({element: mapDiv, center: {lat: 0, lng: 0}, zoom: 8});
-      expect(map.getDiv()).to.equal(mapDiv);
-      expect(map.__gm).to.not.be.undefined;
+      mapManager.createMap(mapDiv, {center: {lat: 0, lng: 0}, zoom: 8}).then( map => {
+        expect(map.getDiv()).to.equal(mapDiv);
+        done();
+      });
     });
 
-    it('Deberia crear mas de un mapa', () => {
+    it('Deberia crear mas de un mapa', (done) => {
       let mapDiv = document.createElement('div');
-      let map = mapManager.createMap({element: mapDiv, center: {lat: 0, lng: 0}, zoom: 8});
-      expect(map.getDiv()).to.equal(mapDiv);
-      expect(map.__gm).to.not.be.undefined;
+      mapManager.createMap(mapDiv, {center: {lat: 0, lng: 0}, zoom: 8}).then( map => {
+        expect(map.getDiv()).to.equal(mapDiv);
+        expect(mapManager.getMaps().length).to.equal(2);
+        done();
+      });
     });
+  });
 
-    it('Deberia devolver la cantidad de mapas creados', () => {
-      let mapsLength = mapManager.getMaps().length;
-      expect(mapsLength).to.equal(2);
+  describe('Creacion de markers', () => {
+    it('Deberia crear un marker y agregarlo al mapa', function(done) {
+      let mapDiv = document.createElement('div');
+      mapManager.createMap(mapDiv, {center: {lat: 0, lng: 0}, zoom: 8}).then( map => {
+        let marker = mapManager.addMarker(map, {position: {lat: -34.7040225, lng: -58.308597}, draggable: true});
+        expect(marker.visible).to.equal(true);
+        done();
+      });
     });
   });
 });

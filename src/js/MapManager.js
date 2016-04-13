@@ -15,32 +15,34 @@ export default class MapManager {
         GoogleMapsLoader.onLoad( (google) => {
           _libraryLoaded = true;
           _library = google;
-          resolve({manager: this, google: google, alreadyLoaded: false});
+          resolve({google: _library, alreadyLoaded: false});
         });
       } else {
-        resolve({manager: this, google: google, alreadyLoaded: true});
+        resolve({google: _library, alreadyLoaded: true});
       }
     });
   }
 
-  createMap({element, center, zoom = 8} = {}) {
-    let _map = new google.maps.Map(element, {
-      center: center,
-      zoom: zoom
-    })
+  createMap(element, options = {}) {
+    let self, _map, _loaded;
 
-    if (_map.__gm) {
-      this._maps.push(_map);
+    self = this;
+    _map = new _library.maps.Map(element),
+    _loaded = new Promise((resolve, reject) => {
+      _library.maps.event.addListenerOnce(_map, 'idle', function(){
+        self._maps.push(_map);
+        _map.setOptions(options);
+        resolve(_map);
+      });
+    });
 
-      //Mejorar esto
-      setTimeout(() => {
-        _map.setCenter(center);
-      }, 600);
+    return _loaded;
+  }
 
-      return _map;
-    } else {
-      throw new Error('Error creating map');
-    }
+  addMarker(mapa,options = {}) {
+    let _options = Object.assign({map: mapa},options,{animation: _library.maps.Animation.DROP});
+    let _marker = new _library.maps.Marker(_options);
+    return _marker;
   }
 
   getMaps() {
